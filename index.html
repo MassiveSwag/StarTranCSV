@@ -78,7 +78,7 @@ a:hover {
 <body>
 
 <h2>StarTran Ticket Tracker Data</h2>
-<h4>Updated July 28th, 2026 at 12:48:04 PM</h4>
+<h4>Updated July 28th, 2026 at 12:53:31 PM</h4>
 <table id="dataTable">
     <thead>
         <tr>
@@ -357,7 +357,6 @@ let sortAscending = true;
 
 document.querySelectorAll("#dataTable thead th").forEach((header, index) => {
 
-    // Make the header look clickable
     header.style.cursor = "pointer";
 
     header.addEventListener("click", function () {
@@ -367,7 +366,7 @@ document.querySelectorAll("#dataTable thead th").forEach((header, index) => {
 
         const rows = Array.from(tbody.querySelectorAll("tr"));
 
-        // Reverse direction if clicking the same column
+        // Toggle direction
         if (sortColumn === index) {
             sortAscending = !sortAscending;
         }
@@ -376,25 +375,29 @@ document.querySelectorAll("#dataTable thead th").forEach((header, index) => {
             sortAscending = true;
         }
 
-        rows.sort((a, b) => {
+        rows.sort(function (a, b) {
 
             let valueA = a.cells[index]?.textContent.trim() ?? "";
             let valueB = b.cells[index]?.textContent.trim() ?? "";
 
-            // Remove commas and $ from numbers
+            // Remove $, %, and commas from numbers
             let numberA = valueA.replace(/[$,%]/g, "").replace(/,/g, "");
             let numberB = valueB.replace(/[$,%]/g, "").replace(/,/g, "");
 
-            // If both values are numbers, sort numerically
-            if (!isNaN(numberA) && !isNaN(numberB) &&
-                numberA !== "" && numberB !== "") {
+            // Numeric sorting
+            if (
+                !isNaN(numberA) &&
+                !isNaN(numberB) &&
+                numberA !== "" &&
+                numberB !== ""
+            ) {
 
                 return sortAscending
                     ? Number(numberA) - Number(numberB)
                     : Number(numberB) - Number(numberA);
             }
 
-            // Otherwise sort alphabetically
+            // Text sorting
             return sortAscending
                 ? valueA.localeCompare(valueB, undefined, {
                     numeric: true,
@@ -406,16 +409,18 @@ document.querySelectorAll("#dataTable thead th").forEach((header, index) => {
                 });
         });
 
-        // Put sorted rows back into the table
+        // Put sorted rows back
         rows.forEach(row => tbody.appendChild(row));
 
-        // Update arrows
+        // Remove previous sort indicators
         document.querySelectorAll("#dataTable thead th").forEach(th => {
-            th.textContent = th.textContent
-                .replace(/ ?| ?/g, "");
+            th.classList.remove("sort-asc", "sort-desc");
         });
 
-        header.textContent += sortAscending ? " ?" : " ?";
+        // Add indicator to current column
+        header.classList.add(
+            sortAscending ? "sort-asc" : "sort-desc"
+        );
     });
 
 });
